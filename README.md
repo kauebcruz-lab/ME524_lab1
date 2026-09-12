@@ -2,7 +2,10 @@
 
 ##
 
-O relatório será feito em latex no 
+O relatório será feito em latex no Overleaf.
+https://www.overleaf.com/2691596631jqpmmrsfnytt#d74564
+
+O relatório também é versionado no GitHub, porém somente eu posso fazer o push.
 
 ## Estrutura de arquivos
 
