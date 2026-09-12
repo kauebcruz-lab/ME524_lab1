@@ -1,0 +1,22 @@
+---
+title: "lab1"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+```
+```{r}
+dados <- read_csv("../data/brasileirao_2026.csv")
+```
+
+```{r}
+head(dados)
+```
+
+Caminho para pasta com resultados
+
+```{r}
+resultados_path <- "../data/resultados/"
+```
+
