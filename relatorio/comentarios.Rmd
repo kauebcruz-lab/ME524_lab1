@@ -1,0 +1,23 @@
+Temos dois objetivos nesta primeira etapa: 1. Estimar os parâmetros phi e theta 2. Gerar a classificação atual
+
+Para isso, primeiro vou reestruturar o dataframe, para que fique (rodada, time, gols marcados, gols sofridos) Motivo: Dado que todo time joga uma vez por rodada, Então, quando eu quiser obter Vitórias, Saldo de Gols e gols marcados para a classificação Eu não preciso de mais além de Qual rodada ocorreu o jogo, qual o time, quantos jogos aquele time marcou, quantos sofreu.
+
+Obs: Rodada não é necessária para o calculo atual. Mas podemos utilizar futuramente como referência de tempo.
+
+- Função para tratar dataset (tratar_dados.R):
+
+Lógica do algoritmo: remove NAs, gera uma nova tabela com o resultado para cada time. como cada jogo implica em resultados para dois times, a quantidade de linhas é dobrada. Descartamos a informação de se foi jogado em casa ou não, é possível modificar tratar_dados.R futuramente para que essa informação seja mantida binariamente em uma nova coluna.
+
+- Função para estimar os parâmetros (calcula_medias.R):
+
+Lógica do algoritmo: agrupado por time, theta recebe média de gols marcados por jogo phi recebe média de gols sofridos por jogo
+
+- Função para classificação de times (classificar_times.R):
+
+Lógica do algoritmo: Recebe base com time, gol marcado pelo time, gol sofrido pelo time Obs: granularidade de 1 linha por (time,jogo)
+
+Calcula pontuação por jogo na coluna pontos classifica vitória em 0 ou 1
+
+agrupa por time gerando pontuação, n de vitórias gols marcados gols sofridos quant de jogos (irrelevante com um campeonato simulado completo) e saldo de jogos
+
+ordena para ficar fácil de ler e interpretar ordenei por relevância: classificação, time, critérios de desempate, dados complementares
