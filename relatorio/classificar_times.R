@@ -1,22 +1,26 @@
-classificar_times <- function(dados)
-{
+classificar_times <- function(
+  dados,
+  coluna_time = time,
+  coluna_gols_marcados = gols_marcados,
+  coluna_gols_sofridos = gols_sofridos
+) {
   dados %>%
     mutate(
       pontos = case_when(
-        gols_marcados > gols_sofridos ~ 3,
-        gols_marcados == gols_sofridos ~ 1,
+        {{ coluna_gols_marcados }} > {{ coluna_gols_sofridos }} ~ 3,
+        {{ coluna_gols_marcados }} == {{ coluna_gols_sofridos }} ~ 1,
         TRUE ~ 0
       ),
       vitoria = as.integer(
-        gols_marcados > gols_sofridos
+        {{ coluna_gols_marcados }} > {{ coluna_gols_sofridos }}
       )
     ) %>%
-    group_by(time) %>%
+    group_by({{ coluna_time }}) %>%
     summarise(
       pontos = sum(pontos),
       vitorias = sum(vitoria),
-      gols_marcados = sum(gols_marcados),
-      gols_sofridos = sum(gols_sofridos),
+      gols_marcados = sum({{ coluna_gols_marcados }}),
+      gols_sofridos = sum({{ coluna_gols_sofridos }}),
       jogos = n(),
       .groups = "drop"
     ) %>%
@@ -34,7 +38,7 @@ classificar_times <- function(dados)
     ) %>%
     select(
       classificacao,
-      time,
+      {{ coluna_time }},
       pontos,
       vitorias,
       saldo_gols,
