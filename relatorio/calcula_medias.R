@@ -1,4 +1,4 @@
-estimar_parametros <- function(
+calcula_medias <- function(
   dados,
   coluna_time = time,
   coluna_gols_marcados = gols_marcados,
