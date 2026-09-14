@@ -1,0 +1,21 @@
+classificacao,time,pontos,vitorias,saldo_gols,gols_marcados,gols_sofridos,jogos
+1,Palmeiras,52,15,24,45,21,25
+2,Flamengo,51,15,29,50,21,25
+3,Athletico-PR,45,13,12,37,25,25
+4,Fluminense,42,11,7,39,32,25
+5,Bahia,40,10,7,37,30,25
+6,Cruzeiro,39,11,-1,35,36,25
+7,Coritiba,37,10,0,33,33,25
+8,Atlético-MG,36,10,4,32,28,24
+9,Bragantino,35,10,4,29,25,24
+10,Corinthians,32,8,1,26,25,25
+11,São Paulo,30,8,1,29,28,24
+12,Botafogo,30,8,-3,37,40,24
+13,Vitória,29,8,-13,24,37,25
+14,Santos,29,7,-2,34,36,24
+15,Grêmio,28,7,-5,27,32,24
+16,Mirassol,25,6,-12,27,39,25
+17,Vasco,25,6,-12,27,39,24
+18,Internacional,25,5,-5,26,31,25
+19,Remo,23,5,-12,30,42,25
+20,Chapecoense,14,2,-24,25,49,24

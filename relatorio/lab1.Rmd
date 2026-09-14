@@ -173,11 +173,24 @@ parametros <- estimar_parametros(
   coluna_gols_sofridos = gols_sofridos
 )
 
-classificacao_atual2 <- classificar_times(
+classificacao_atual <- classificar_times(
   dados = df_tratado,
   coluna_time = time,
   coluna_gols_marcados = gols_marcados,
   coluna_gols_sofridos = gols_sofridos
+)
+  
+```
+Persistindo os resultados
+```{r}
+write_csv(
+  parametros,
+  file = file.path(resultados_path, "parametros.csv")
+)
+
+write_csv(
+  classificacao_atual,
+  file = file.path(resultados_path, "classificacao_atual.csv")
 )
 ```
 
