@@ -29,7 +29,7 @@ source("tratar_dados.R")
 dados_tratados <- tratar_dados(dados)
 ```
 
-2.  Gerando tabela com tethas e phis
+2.  Gerando tabela com thetas e phis
 
 ```{r}
 source("calcula_medias.R")
