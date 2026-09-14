@@ -1,11 +1,14 @@
-calcula_medias <- function(dataframe) 
-{
-  
-    group_by(dataframe, time) %>%
+estimar_parametros <- function(
+  dados,
+  coluna_time = time,
+  coluna_gols_marcados = gols_marcados,
+  coluna_gols_sofridos = gols_sofridos
+) {
+  dados %>%
+    group_by({{ coluna_time }}) %>%
     summarise(
-      theta = mean(gols_marcados),
-      phi   = mean(gols_sofridos),
-      
+      theta = mean({{ coluna_gols_marcados }}),
+      phi = mean({{ coluna_gols_sofridos }}),
       .groups = "drop"
     )
 }
