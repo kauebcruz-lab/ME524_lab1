@@ -6,6 +6,7 @@ output: html_document
 ```{r}
 library(tidyverse)
 ```
+
 ```{r}
 dados <- read_csv("../data/brasileirao_2026.csv")
 ```
@@ -20,168 +21,32 @@ Caminho para pasta com resultados
 resultados_path <- "../data/resultados/"
 ```
 
----
-Temos dois objetivos nesta primeira etapa:
-1. Estimar os parâmetros phi e theta
-2. Gerar a classificação atual 
-
-Para isso, primeiro vou reestruturar o dataframe, para que fique (rodada, time, gols marcados, gols sofridos)
-Motivo: 
-  Dado que todo time joga uma vez por rodada,
-  Então, quando eu quiser obter Vitórias, Saldo de Gols e gols marcados para a classificação
-  Eu não preciso de mais além de 
-    Qual rodada ocorreu o jogo, qual o time, quantos jogos aquele time marcou, quantos sofreu.
-    
-Obs: Rodada não é necessária para o calculo atual. Mas podemos utilizar futuramente como referência de tempo.
-
-(
-Lógica do algoritmo:
-
-filtrar o NA para remover jogos ainda não realizados
-
-transmute gera as colunas com os valores adequados
-bind rows empilha os transmutes
-)
+1.  Tratando dados
 
 ```{r}
+source("tratar_dados.R")
 
-df_tratado <- dados %>%
-  filter(
-    !is.na(gols_mandante),
-    !is.na(gols_visitante)
-  ) %>%
-  {
-    bind_rows(
-      transmute(
-        .,
-        rodada = rodada,
-        time = time_mandante,
-        gols_marcados = gols_mandante,
-        gols_sofridos = gols_visitante
-      ),
-      transmute(
-        .,
-        rodada = rodada,
-        time = time_visitante,
-        gols_marcados = gols_visitante,
-        gols_sofridos = gols_mandante
-      )
-    )
-  } %>%
-  arrange(rodada, time)
+dados_tratados <- tratar_dados(dados)
 ```
 
-Agora, com essa base, eu rodo a seguinte função para estimar os parametros:
-
-(
-Lógica do algoritmo:
-agrupado por time,
-theta recebe média de gols marcados por jogo
-phi   recebe média de gols sofridos por jogo
-)
+2.  Gerando tabela com thetas e phis
 
 ```{r}
-estimar_parametros <- function(dados, coluna_time, coluna_gols_marcados, coluna_gols_sofridos) {
-  dados %>%
-    group_by({{ coluna_time }}) %>%
-    summarise(
-      theta = mean({{ coluna_gols_marcados }}),
-      phi = mean({{ coluna_gols_sofridos }})
-    )
-}
+source("calcula_medias.R")
+
+parametros <- calcula_medias(dados_tratados)
 ```
 
-E a seguinte função para classificar com base nos jogos do cenário atual:
+3.  Gerando tabela de classificação
 
-(Lógica do algoritmo:
-Recebe base com time, gol marcado pelo time, gol sofrido pelo time
-  Obs: granularidade de 1 linha por (time,jogo)
-
-Calcula pontuação por jogo na coluna pontos
-classifica vitória em 0 ou 1
-
-agrupa por time gerando
-pontuação,
-n de vitórias
-gols marcados
-gols sofridos
-quant de jogos (irrelevante com um campeonato simulado completo)
-e saldo de jogos
-
-ordena para ficar fácil de ler e interpretar
-ordenei por relevância: classificação, time, critérios de desempate, dados complementares
-)
 ```{r}
-classificar_times <- function(
-  dados,
-  coluna_time,
-  coluna_gols_marcados,
-  coluna_gols_sofridos
-) {
-  dados %>%
-    mutate(
-      pontos = case_when(
-        {{ coluna_gols_marcados }} > {{ coluna_gols_sofridos }} ~ 3,
-        {{ coluna_gols_marcados }} == {{ coluna_gols_sofridos }} ~ 1,
-        TRUE ~ 0
-      ),
-      vitoria = as.integer(
-        {{ coluna_gols_marcados }} > {{ coluna_gols_sofridos }}
-      )
-    ) %>%
-    group_by({{ coluna_time }}) %>%
-    summarise(
-      pontos = sum(pontos),
-      vitorias = sum(vitoria),
-      gols_marcados = sum({{ coluna_gols_marcados }}),
-      gols_sofridos = sum({{ coluna_gols_sofridos }}),
-      jogos = n()
-    ) %>%
-    mutate(
-      saldo_gols = gols_marcados - gols_sofridos
-    ) %>%
-    arrange(
-      desc(pontos),
-      desc(vitorias),
-      desc(saldo_gols),
-      desc(gols_marcados)
-    ) %>%
-    mutate(
-      classificacao = row_number()
-    ) %>%
-    select(
-      classificacao,
-      {{ coluna_time }},
-      pontos,
-      vitorias,
-      saldo_gols,
-      gols_marcados,
-      gols_sofridos,
-      jogos
-    )
-}
+source("classificar_times.R")
 
+classificacao_atual <- classificar_times(dados_tratados)
 ```
 
-Aplicando elas:
-```{r}
+4.  Gerando outputs
 
-parametros <- estimar_parametros(
-  dados = df_tratado,
-  coluna_time = time,
-  coluna_gols_marcados = gols_marcados,
-  coluna_gols_sofridos = gols_sofridos
-)
-
-classificacao_atual <- classificar_times(
-  dados = df_tratado,
-  coluna_time = time,
-  coluna_gols_marcados = gols_marcados,
-  coluna_gols_sofridos = gols_sofridos
-)
-  
-```
-Persistindo os resultados
 ```{r}
 write_csv(
   parametros,
@@ -193,4 +58,3 @@ write_csv(
   file = file.path(resultados_path, "classificacao_atual.csv")
 )
 ```
-
