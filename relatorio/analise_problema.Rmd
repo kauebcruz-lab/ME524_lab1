@@ -1,0 +1,112 @@
+
+
+Perguntas
+
+Por meio de aproximações Monte Carlo, devem ser respondidas as seguintes perguntas:
+
+1. Qual a probabilidade de cada time ser campeão?
+2. Qual a probabilidade de cada time ser rebaixado?
+3. Qual a probabilidade do campeonato ser decidido pelos critérios de desempate (2 ou mais equipes
+empatam em pontos)?
+4. Qual o valor esperado do número de pontos do campeão?
+5. Quantos pontos uma qualquer equipe precisa fazer para ter pelo menos 90% de chance de ser o campeão?
+6. Quantos pontos são necessários que um time qualquer faça para ter pelo menos 95% de chance de não
+ser rebaixado.
+
+---
+
+O algoritmo monte carlo:
+
+---
+Pergunta 1: probabilidade de um time ser campeão
+  
+  Para cada seleção b simulada,
+    I(b)_i = {
+              1, se o time i foi campeão
+              0, caso contrário
+              }
+    Com B simulações de seleção, podemos obter
+    
+  Probabilidade_estimada(time i ser campeão) = {somatório de b=1 a B, de I(b)_i}/B
+
+---
+Pergunta 2: probabilidade de um time ser rebaixado
+  
+  Para cada seleção b simulada,
+    R(b)_i = {
+              1, se o time i foi rebaixado
+              0, caso contrário
+              }
+    Com B simulações de seleção, podemos obter
+    
+  Probabilidade_estimada(time i ser rebaixado) = {somatório de b=1 a B, de R(b)_i}/B
+
+(análogo à pergunta 1. O mesmo algoritmo pode ser aproveitado, mudando a posição 1 para posição 17:20)
+
+---
+Pergunta 3: probabilidade de campeonato ser decidido por desempate
+  
+  Para cada seleção b simulada,
+    D(b) = {
+              1, se ponto_classificado_1 = ponto_classificado_2
+              0, caso contrário
+              }
+    Com B simulações de seleção, podemos obter
+    
+  Probabilidade_estimada(desempate) = {somatório de b=1 a B, de D(b)}/B
+
+---
+Pergunta 4: Qual o valor esperado do número de pontos do campeão?
+  
+  Para cada seleção b simulada,
+    P_campeao(b) = {pontuação do campeão na simulação b}
+    
+  Com B simulações de seleção, podemos obter
+    
+  Esperança(P) = {somatório de b=1 a B, de P_campeao(b)}/B
+
+Dado mínimo necessário: Pontos do primeiro colocado
+Sugestão:
+vetor dos pontos ou
+incremento de pontuação (soma_acumulada dos pontos/numero de simulações)
+---
+Pergunta 5: Quantos pontos uma qualquer equipe precisa fazer para ter pelo menos 90% de chance de ser o campeão?
+  
+  Para cada seleção b simulada,
+    obter a frequência de pontos e frequência de campeões com aqueles pontos
+    
+  Com B simulações de seleção, podemos obter
+  
+Exemplo de tabela:
+  pontos | freq pontos/quantidade de vezes com times com aquela pontuação | quantidade de campeões com aquela pontuação
+  p | freq_pontos | freq_campeao
+  60 | 700 | 70
+
+  Prob_estimada(Campeão | Pontos = p) = freq_campeao / freq_pontos
+
+Sugestão:
+esse algoritmo só precisa gerar acumulado 
+total de times por ponto
+campeão por ponto
+
+---
+
+Pergunta 6: Quantos pontos são necessários que um time qualquer faça para ter PELO MENOS 95% de chance de não
+ser rebaixado.
+  
+  Para cada seleção b simulada,
+    obter a frequência de pontos e frequência de NÃO rebaixados com aqueles pontos
+    
+  Com B simulações de seleção, podemos obter
+  
+Exemplo de tabela:
+  pontos | freq pontos/quantidade de times com aquela pontuação | quantidade de NÃO rebaixados com aquela pontuação
+  p | freq_pontos | freq_nao_rebaixado
+  60 | 700 | 70
+
+  Prob_estimada(Não rebaixado| Pontos = p) = freq_nao_rebaixado / freq_pontos
+
+Sugestão:
+esse algoritmo é análogo ao 5.
+Porém, me chama a atenção o pelo menos.
+Fica aqui um ponto de atenção para revisar/validar.
