@@ -1,0 +1,83 @@
+Resumo - Dados necessários para responder as perguntas
+Obs: Seja B o número de simulações Monte Carlo, isto é, quantidade de campeonatos simulados.
+
+Output:
+
+Time| P(Campeão) | P(Rebaixado)
+{Nome do time, titulo por time/B, rebaixamentos por time/B}
+
+P(Desempate) {Ponto_primeiro_classificado = Ponto_segundo_classificado: n desempates/B}
+
+E(Pontos_Campeão) {Soma acumulada de pontos do campeão/ B}
+
+P(Campeão | Ponto = p)
+
+P(Não rebaixado| Ponto = p)
+
+---
+# Fluxo
+
+## Entrada
+dados_tratados
+parametros
+jogos_futuros
+
+Para b = 1, ..., B
+  Simular gols dos jogos futuros
+  Atualizar estado dos 20 times
+  Gerar classificação final
+  
+## Extrair
+  campeão
+  rebaixados
+  houve_desempate
+  pontos_campeão
+  pontos de todos os times
+  posição de todos os times
+  
+### Atualizar acumuladores:
+  titulos_por_time
+  rebaixamentos_por_time
+  n_desempates
+  soma_pontos_campeao
+  total_por_pontos
+  campeoes_por_pontos
+  nao_rebaixados_por_pontos
+  
+---
+
+Definição de objetos:
+
+dados_tratados:
+{
+  rodada, # Opcional
+  time,
+  gols marcados,
+  gols sofridos
+}
+
+parametros:
+{
+time,
+theta_estimado,
+phi_estimado
+}
+
+jogos_futuros:
+{
+rodada,
+time_mandante,
+time_visitante
+}
+
+classificacao_atual:
+{
+  classificacao,
+  time,
+  pontos,
+  vitorias,
+  saldo_gols,
+  gols_marcados,
+  gols_sofridos,
+  jogos
+}
