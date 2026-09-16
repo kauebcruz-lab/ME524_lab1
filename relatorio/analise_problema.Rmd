@@ -110,3 +110,21 @@ Sugestão:
 esse algoritmo é análogo ao 5.
 Porém, me chama a atenção o pelo menos.
 Fica aqui um ponto de atenção para revisar/validar.
+
+
+---
+
+Resumo - Dados necessários para responder as perguntas
+
+
+Output:
+
+Time| P(Campeão) | P(Rebaixado)
+
+P(Desempate) 
+
+E(Pontos_Campeão) 
+
+P(Campeão | Ponto = p)
+
+P(Não rebaixado| Ponto = p)
