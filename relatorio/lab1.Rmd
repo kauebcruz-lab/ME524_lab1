@@ -21,12 +21,14 @@ Caminho para pasta com resultados
 resultados_path <- "../data/resultados/"
 ```
 
-1.  Tratando dados
+1.  Tratando dados, separando em partidas realizadas e partidas futuras
 
 ```{r}
 source("tratar_dados.R")
+source("extrair_jogos_futuros.R")
 
 dados_tratados <- tratar_dados(dados)
+jogos_futuros <- extrair_jogos_futuros(dados)
 ```
 
 2.  Gerando tabela com thetas e phis
@@ -45,7 +47,8 @@ source("classificar_times.R")
 classificacao_atual <- classificar_times(dados_tratados)
 ```
 
-4.  Gerando outputs
+
+A.  Gerando outputs
 
 ```{r}
 write_csv(
