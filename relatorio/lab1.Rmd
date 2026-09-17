@@ -47,6 +47,34 @@ source("classificar_times.R")
 classificacao_atual <- classificar_times(dados_tratados)
 ```
 
+```{r}
+source("inicializar_acumuladores.R")
+source("atualizar_acumuladores.R")
+
+```
+
+```{r}
+source("formatar_resultados.R")
+source("monte_carlo_campeonato.R")
+source("simular_jogos.R")
+```
+
+
+
+```{r}
+resultados_mc <- monte_carlo_campeonato(
+    dados_tratados= dados_tratados,
+    jogos_futuros = jogos_futuros,
+    parametros = parametros,
+    B = 10000
+)
+```
+
+Resultado:
+```{r}
+resultados_mc
+```
+
 
 A.  Gerando outputs
 
