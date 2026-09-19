@@ -21,12 +21,14 @@ Caminho para pasta com resultados
 resultados_path <- "../data/resultados/"
 ```
 
-1.  Tratando dados
+1.  Tratando dados, separando em partidas realizadas e partidas futuras
 
 ```{r}
 source("tratar_dados.R")
+source("extrair_jogos_futuros.R")
 
 dados_tratados <- tratar_dados(dados)
+jogos_futuros <- extrair_jogos_futuros(dados)
 ```
 
 2.  Gerando tabela com thetas e phis
@@ -45,7 +47,36 @@ source("classificar_times.R")
 classificacao_atual <- classificar_times(dados_tratados)
 ```
 
-4.  Gerando outputs
+```{r}
+source("inicializar_acumuladores.R")
+source("atualizar_acumuladores.R")
+
+```
+
+```{r}
+source("formatar_resultados.R")
+source("monte_carlo_campeonato.R")
+source("simular_jogos.R")
+```
+
+
+
+```{r}
+resultados_mc <- monte_carlo_campeonato(
+    dados_tratados= dados_tratados,
+    jogos_futuros = jogos_futuros,
+    parametros = parametros,
+    B = 10000
+)
+```
+
+Resultado:
+```{r}
+resultados_mc
+```
+
+
+A.  Gerando outputs
 
 ```{r}
 write_csv(
