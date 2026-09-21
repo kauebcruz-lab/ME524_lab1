@@ -34,9 +34,9 @@ jogos_futuros <- extrair_jogos_futuros(dados)
 2.  Gerando tabela com thetas e phis
 
 ```{r}
-source("calcula_medias.R")
+source("estimar_parametros.R")
 
-parametros <- calcula_medias(dados_tratados)
+parametros <- estimar_parametros(dados_tratados)
 ```
 
 3.  Gerando tabela de classificação
