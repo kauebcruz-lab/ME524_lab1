@@ -20,12 +20,15 @@ atualizar_acumuladores <- function(
     acumuladores$rebaixamentos_por_time[rebaixados] + 1
   
   # Pergunta 3
+  # Há necessidade de desempate se dois ou mais times terminarem
+  # com a maior pontuação. Isso também cobre empates tríplices ou maiores.
+  times_no_topo <- sum(
+    classificacao$pontos == pontos_campeao
+  )
+
   acumuladores$numero_desempates <-
     acumuladores$numero_desempates +
-    as.integer(
-      classificacao$pontos[1] ==
-        classificacao$pontos[2]
-    )
+    as.integer(times_no_topo >= 2)
   
   # Pergunta 4
   acumuladores$soma_pontos_campeao <-
