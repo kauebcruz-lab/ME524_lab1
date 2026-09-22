@@ -38,7 +38,7 @@ jogos_futuros <- extrair_jogos_futuros(dados)
 2.  Gerando tabela com thetas e phis
 
 ```{r}
-source("r_utils/calcula_medias.R")
+source("r_utils/estimar_parametros.R")
 
 parametros <- estimar_parametros(dados_tratados)
 ```
