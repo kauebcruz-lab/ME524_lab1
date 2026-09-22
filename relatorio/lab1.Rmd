@@ -133,10 +133,11 @@ Aqui será feita uma regressão de poisson para cada time para prever o número 
 Para avaliação do desempenho preditivo é utilizado 80% dos dados para treino, porém para realizar as simulações, os modelos treinados em cima de todos os dados são utilizados.
 
 As variáveis explicativas são:
-- Se o jogo é em casa
-- Quantidade de gols acumulados
-- Vitórias acumuladas
-- Rodada do campeonato
+- `em_casa`: 1 para mandante e 0 para visitante;
+- `gols_acumulados`: gols já marcados pelo próprio clube;
+- `vitorias_acumuladas`: vitórias já obtidas pelo próprio clube;
+- `rodada`: número da rodada;
+- `defesa_adversario`: média de gols que o adversário sofreu por jogo até a rodada anterior.
 
 
 ```{r}

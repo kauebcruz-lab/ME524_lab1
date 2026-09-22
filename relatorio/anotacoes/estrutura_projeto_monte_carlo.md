@@ -95,15 +95,17 @@ Arquivos principais:
 
 Para cada time, são calculados:
 
-- `theta`: média de gols marcados por jogo;
-- `phi`: média de gols sofridos por jogo.
+- $theta$: média de gols marcados por jogo;
+- $phi$: média de gols sofridos por jogo.
 
 Para uma partida, os parâmetros Poisson são:
 
-```r
-lambda_mandante = (theta_mandante + phi_visitante) / 2
-lambda_visitante = (theta_visitante + phi_mandante) / 2
-```
+$$
+\lambda_{mandante} = (\theta_{mandante} + \phi_{visitante}) / 2
+$$
+$$
+\lambda_{visitante} = (\theta_{visitante} + \phi_{mandante}) / 2
+$$
 
 Os gols são então sorteados com `rpois()`. Esta abordagem não estima um
 modelo por par de times: ela estima ataque e defesa por clube. Portanto, ainda
@@ -210,24 +212,3 @@ média.
 A função de salvamento sobrescreve os dois arquivos com o dataframe inteiro;
 ela não acrescenta uma linha automaticamente. Para salvar várias abordagens,
 use `bind_rows()` antes de chamar a função de salvamento.
-
-## Execução e sessões R
-
-As funções devem ser carregadas antes da simulação. O erro
-`objeto 'classificar_times' não encontrado` aparece quando se executa apenas o
-chunk da Monte Carlo sem executar os `source()` anteriores. Ao renderizar o
-Rmd desde o início, as funções são carregadas na ordem correta.
-
-O Codex no VS Code edita os arquivos do projeto, mas não compartilha a sessão
-R aberta no RStudio. Para executar testes também pelo terminal do VS Code,
-`Rscript.exe` precisa estar disponível no `PATH`, por exemplo:
-
-```text
-C:\Program Files\R\R-4.5.2\bin
-```
-
-Depois de alterar o PATH, reinicie o VS Code/Codex e confirme com:
-
-```powershell
-Rscript --version
-```
