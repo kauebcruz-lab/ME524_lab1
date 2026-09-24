@@ -15,46 +15,54 @@ dados <- read_csv("../data/brasileirao_2026.csv")
 head(dados)
 ```
 
-Caminho para pasta com resultados
+Caminho para pasta com resultados:
 
 ```{r}
 resultados_path <- "../data/resultados/"
 ```
 
-# Abordagem 1
+# Monte Carlo
 
-Nessa abordagem, é considerado o modelo padrão de poisson pedido pelo lab
+Nessa abordagem, é considerado o modelo padrão de Poisson pedido pelo lab.
 
-1.  Tratando dados, separando em partidas realizadas e partidas futuras
+## 1. Tratando dados
+
+Separando em partidas realizadas e partidas futuras.
 
 ```{r}
-source("r_utils/tratar_dados.R")
-source("r_utils/extrair_jogos_futuros.R")
+source("r_utils/montecarlo/tratar_dados.R")
+source("r_utils/montecarlo/extrair_jogos_futuros.R")
 
 dados_tratados <- tratar_dados(dados)
 jogos_futuros <- extrair_jogos_futuros(dados)
 ```
 
-2.  Gerando tabela com thetas e phis
+## 2. Estimando parâmetros
+
+Gerando tabela com thetas e phis.
 
 ```{r}
-source("r_utils/estimar_parametros.R")
+source("r_utils/montecarlo/estimar_parametros.R")
 
 parametros <- estimar_parametros(dados_tratados)
 ```
 
-3.  Gerando tabela de classificação
+## 3. Classificação atual
+
+Gerando tabela de classificação.
 
 ```{r}
-source("r_utils/classificar_times.R")
+source("r_utils/montecarlo/classificar_times.R")
 
 classificacao_atual <- classificar_times(dados_tratados)
 ```
 
-4. Associa a cada jogo futuro o parâmetro $\lambda$ do time mandante e visitante.
+## 4. Lambdas dos jogos futuros
+
+Associa a cada jogo futuro o parâmetro $\lambda$ do time mandante e visitante.
 
 ```{r}
-source("r_utils/calcular_lambdas_poisson_combinada.R")
+source("r_utils/montecarlo/calcular_lambdas_poisson_combinada.R")
 
 jogos_futuros <- calcular_lambdas_poisson_combinada(
   jogos_futuros,
@@ -62,23 +70,20 @@ jogos_futuros <- calcular_lambdas_poisson_combinada(
 )
 ```
 
+## 5. Simulação
 
 ```{r}
-source("r_utils/inicializar_acumuladores.R")
-source("r_utils/atualizar_acumuladores.R")
-
+source("r_utils/montecarlo/inicializar_acumuladores.R")
+source("r_utils/montecarlo/atualizar_acumuladores.R")
+source("r_utils/montecarlo/formatar_resultados.R")
+source("r_utils/montecarlo/monte_carlo_campeonato.R")
+source("r_utils/montecarlo/simular_jogos.R")
+source("r_utils/montecarlo/combinar_acumuladores.R")
+source("r_utils/montecarlo/avaliar_poisson_combinada.R")
+source("r_utils/montecarlo/executar_abordagem.R")
 ```
 
-```{r}
-source("r_utils/formatar_resultados.R")
-source("r_utils/monte_carlo_campeonato.R")
-source("r_utils/simular_jogos.R")
-source("r_utils/combinar_acumuladores.R")
-source("r_utils/avaliar_poisson_combinada.R")
-source("r_utils/executar_abordagem.R")
-```
-
-O processo só é reprodutível caso o n_cores seja o mesmo, além da sedd. O número de cores utilizado para as execuções foi 11.
+O processo só é reprodutível caso o n_cores seja o mesmo, além da seed. O número de cores utilizado para as execuções foi 11.
 
 ```{r}
 resultados_abordagens <- executar_abordagem(
@@ -91,24 +96,40 @@ resultados_abordagens <- executar_abordagem(
     seed = 524,
     n_cores = max(1, parallel::detectCores() - 1)
 )
-
 ```
 
-Resultado:
+## Outputs
+
+Resultado da simulação:
+
 ```{r}
 resultados_abordagens
 ```
 
----
+Salvando parâmetros e classificação atual:
 
-Bootstrap:
+```{r}
+write_csv(
+  parametros,
+  file = file.path(resultados_path, "parametros.csv")
+)
+
+write_csv(
+  classificacao_atual,
+  file = file.path(resultados_path, "classificacao_atual.csv")
+)
+```
+
+# Bootstrap
+
+## 1. Intervalos de confiança
 
 ```{r}
 # funções do bootstrap
-source("bootstrap_time.R")
-source("resumir_bootstrap.R")
-source("bootstrap_campeonato.R")
-source("plotar_bootstrap.R")
+source("r_utils/bootstrap/bootstrap_time.R")
+source("r_utils/bootstrap/resumir_bootstrap.R")
+source("r_utils/bootstrap/bootstrap_campeonato.R")
+source("r_utils/bootstrap/plotar_bootstrap.R")
 ```
 
 ```{r}
@@ -125,6 +146,7 @@ resultados_bootstrap <- bootstrap_campeonato(
 resultados_bootstrap
 ```
 
+## 2. Gráfico
 
 ```{r}
 grafico_bootstrap <- plotar_bootstrap(
@@ -134,8 +156,8 @@ grafico_bootstrap <- plotar_bootstrap(
 grafico_bootstrap
 ```
 
+## Outputs
 
-Persistindo resultados:
 ```{r}
 write_csv(
   resultados_bootstrap,
@@ -157,47 +179,36 @@ ggsave(
 )
 ```
 
+# Extra
 
-A.  Gerando outputs
-
-```{r}
-write_csv(
-  parametros,
-  file = file.path(resultados_path, "parametros.csv")
-)
-
-write_csv(
-  classificacao_atual,
-  file = file.path(resultados_path, "classificacao_atual.csv")
-)
-```
-
-
-
-# Abordagem 2
-
-Aqui será feita uma regressão de poisson para cada time para prever o número de gols dele em uma partida.
-
-Nesta abordagem, cada time recebe uma regressão de Poisson com ligação
-canônica (`log`). Os preditores são mando de campo, gols acumulados, vitórias
-acumuladas, rodada e a média de gols sofridos pelo adversário até a rodada
-anterior.
-
-Aqui será feita uma regressão de poisson para cada time para prever o número de gols dele em uma partida, utilizando a função de ligação canônica.
+Aqui será feita uma regressão de Poisson para cada time para prever o número de gols dele em uma partida, utilizando a função de ligação canônica (`log`).
 
 Para avaliação do desempenho preditivo é utilizado 80% dos dados para treino, porém para realizar as simulações, os modelos treinados em cima de todos os dados são utilizados.
 
 As variáveis explicativas são:
+
 - `em_casa`: 1 para mandante e 0 para visitante;
 - `gols_acumulados`: gols já marcados pelo próprio clube;
 - `vitorias_acumuladas`: vitórias já obtidas pelo próprio clube;
 - `rodada`: número da rodada;
 - `defesa_adversario`: média de gols que o adversário sofreu por jogo até a rodada anterior.
 
+## 1. Ajustando as regressões
 
 ```{r}
-source("r_utils/regressao_poisson_por_time.R")
+source("r_utils/extra/criar_estado_times.R")
+source("r_utils/extra/atualizar_estado_times.R")
+source("r_utils/extra/defesa_atual.R")
+source("r_utils/extra/criar_linha_regressao.R")
+source("r_utils/extra/construir_painel_regressao_poisson.R")
+source("r_utils/extra/ajustar_regressoes_poisson_por_time.R")
+source("r_utils/extra/prever_lambda_regressao.R")
+source("r_utils/extra/criar_contexto_regressao_poisson.R")
+source("r_utils/extra/simular_jogos_regressao_poisson.R")
+source("r_utils/extra/avaliar_regressao_poisson_por_time.R")
+```
 
+```{r}
 # Para a simulação, os modelos usam todos os jogos realizados até agora.
 modelos_regressao <- ajustar_regressoes_poisson_por_time(dados)
 parametros_regressao <- tibble(time = names(modelos_regressao))
@@ -206,7 +217,11 @@ contexto_regressao <- criar_contexto_regressao_poisson(
   dados_realizados = dados,
   modelos = modelos_regressao
 )
+```
 
+## 2. Simulação
+
+```{r}
 resultado_abordagem_2 <- executar_abordagem(
   nome_abordagem = "Regressão Poisson por time",
   dados_tratados = dados_tratados,
@@ -231,13 +246,24 @@ resultados_abordagens <- bind_rows(
   resultados_abordagens,
   resultado_abordagem_2
 )
+```
+
+## Outputs
+
+Resultado das duas abordagens:
+
+```{r}
+resultados_abordagens
+```
+
+Salvando os resultados:
+
+```{r}
+source("r_utils/montecarlo/salvar_resultados_abordagens.R")
 
 salvar_resultados_abordagens(
   resultados_abordagens,
   resultados_path
 )
-```
-
-```{r}
-resultados_abordagens
+# gera arquivo resultados_abordagens_resumo.csv
 ```

@@ -8,7 +8,7 @@ avaliar_poisson_combinada <- function(dados, proporcao_treino = 0.80) {
   rodada_final_treino <- rodadas[n_rodadas_treino]
   treino <- jogos_realizados %>% filter(rodada <= rodada_final_treino)
   teste <- jogos_realizados %>% filter(rodada > rodada_final_treino)
-  parametros <- calcula_medias(tratar_dados(treino))
+  parametros <- estimar_parametros(tratar_dados(treino))
   previsoes <- calcular_lambdas_poisson_combinada(teste, parametros)
   erros_quadrados <- c(
     (previsoes$gols_mandante - previsoes$lambda_mandante)^2,
