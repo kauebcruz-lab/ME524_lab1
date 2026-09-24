@@ -21,11 +21,15 @@ Caminho para pasta com resultados
 resultados_path <- "../data/resultados/"
 ```
 
+# Abordagem 1
+
+Nessa abordagem, é considerado o modelo padrão de poisson pedido pelo lab
+
 1.  Tratando dados, separando em partidas realizadas e partidas futuras
 
 ```{r}
-source("tratar_dados.R")
-source("extrair_jogos_futuros.R")
+source("r_utils/tratar_dados.R")
+source("r_utils/extrair_jogos_futuros.R")
 
 dados_tratados <- tratar_dados(dados)
 jogos_futuros <- extrair_jogos_futuros(dados)
@@ -34,7 +38,7 @@ jogos_futuros <- extrair_jogos_futuros(dados)
 2.  Gerando tabela com thetas e phis
 
 ```{r}
-source("estimar_parametros.R")
+source("r_utils/estimar_parametros.R")
 
 parametros <- estimar_parametros(dados_tratados)
 ```
@@ -42,37 +46,57 @@ parametros <- estimar_parametros(dados_tratados)
 3.  Gerando tabela de classificação
 
 ```{r}
-source("classificar_times.R")
+source("r_utils/classificar_times.R")
 
 classificacao_atual <- classificar_times(dados_tratados)
 ```
 
+4. Associa a cada jogo futuro o parâmetro $\lambda$ do time mandante e visitante.
+
 ```{r}
-source("inicializar_acumuladores.R")
-source("atualizar_acumuladores.R")
+source("r_utils/calcular_lambdas_poisson_combinada.R")
+
+jogos_futuros <- calcular_lambdas_poisson_combinada(
+  jogos_futuros,
+  parametros
+)
+```
+
+
+```{r}
+source("r_utils/inicializar_acumuladores.R")
+source("r_utils/atualizar_acumuladores.R")
 
 ```
 
 ```{r}
-source("formatar_resultados.R")
-source("monte_carlo_campeonato.R")
-source("simular_jogos.R")
+source("r_utils/formatar_resultados.R")
+source("r_utils/monte_carlo_campeonato.R")
+source("r_utils/simular_jogos.R")
+source("r_utils/combinar_acumuladores.R")
+source("r_utils/avaliar_poisson_combinada.R")
+source("r_utils/executar_abordagem.R")
 ```
 
-
+O processo só é reprodutível caso o n_cores seja o mesmo, além da sedd. O número de cores utilizado para as execuções foi 11.
 
 ```{r}
-resultados_mc <- monte_carlo_campeonato(
-    dados_tratados= dados_tratados,
+resultados_abordagens <- executar_abordagem(
+    nome_abordagem = "Poisson combinada por time",
+    dados_tratados = dados_tratados,
     jogos_futuros = jogos_futuros,
     parametros = parametros,
-    B = 10000
+    dados_completos = dados,
+    B = 10000,
+    seed = 524,
+    n_cores = max(1, parallel::detectCores() - 1)
 )
+
 ```
 
 Resultado:
 ```{r}
-resultados_mc
+resultados_abordagens
 ```
 
 ---
@@ -146,4 +170,74 @@ write_csv(
   classificacao_atual,
   file = file.path(resultados_path, "classificacao_atual.csv")
 )
+```
+
+
+
+# Abordagem 2
+
+Aqui será feita uma regressão de poisson para cada time para prever o número de gols dele em uma partida.
+
+Nesta abordagem, cada time recebe uma regressão de Poisson com ligação
+canônica (`log`). Os preditores são mando de campo, gols acumulados, vitórias
+acumuladas, rodada e a média de gols sofridos pelo adversário até a rodada
+anterior.
+
+Aqui será feita uma regressão de poisson para cada time para prever o número de gols dele em uma partida, utilizando a função de ligação canônica.
+
+Para avaliação do desempenho preditivo é utilizado 80% dos dados para treino, porém para realizar as simulações, os modelos treinados em cima de todos os dados são utilizados.
+
+As variáveis explicativas são:
+- `em_casa`: 1 para mandante e 0 para visitante;
+- `gols_acumulados`: gols já marcados pelo próprio clube;
+- `vitorias_acumuladas`: vitórias já obtidas pelo próprio clube;
+- `rodada`: número da rodada;
+- `defesa_adversario`: média de gols que o adversário sofreu por jogo até a rodada anterior.
+
+
+```{r}
+source("r_utils/regressao_poisson_por_time.R")
+
+# Para a simulação, os modelos usam todos os jogos realizados até agora.
+modelos_regressao <- ajustar_regressoes_poisson_por_time(dados)
+parametros_regressao <- tibble(time = names(modelos_regressao))
+contexto_regressao <- criar_contexto_regressao_poisson(
+  jogos_futuros = extrair_jogos_futuros(dados),
+  dados_realizados = dados,
+  modelos = modelos_regressao
+)
+
+resultado_abordagem_2 <- executar_abordagem(
+  nome_abordagem = "Regressão Poisson por time",
+  dados_tratados = dados_tratados,
+  jogos_futuros = contexto_regressao,
+  parametros = parametros_regressao,
+  dados_completos = dados,
+  B = 10000,
+  seed = 524,
+  n_cores = max(1, parallel::detectCores() - 1),
+  avaliador = avaliar_regressao_poisson_por_time,
+  simulador = simular_jogos_regressao_poisson,
+  objetos_worker = c(
+    "simular_jogos_regressao_poisson",
+    "prever_lambda_regressao",
+    "criar_linha_regressao",
+    "defesa_atual",
+    "atualizar_estado_times"
+  )
+)
+
+resultados_abordagens <- bind_rows(
+  resultados_abordagens,
+  resultado_abordagem_2
+)
+
+salvar_resultados_abordagens(
+  resultados_abordagens,
+  resultados_path
+)
+```
+
+```{r}
+resultados_abordagens
 ```

@@ -1,0 +1,3 @@
+abordagem,q3_prob_desempate,q4_media_pontos_campeao,q5_pontos_90_campeao,q6_pontos_95_nao_rebaixado,tempo_execucao_segundos,sqe_medio,nll_medio,jogos_treino,jogos_teste
+Poisson combinada por time,0.0691,76.8094,80,45,25.310000000004948,1.1886413043478261,1.4354496393596665,200,46
+Regressão Poisson por time,0.0753,78.6595,81,45,588.0999999999985,6.284992363504078,2.0814632915963704,200,46
