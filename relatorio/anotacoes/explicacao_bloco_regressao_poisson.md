@@ -435,7 +435,3 @@ Finalmente, o estado atualizado é retornado pela função.
 Cria uma lista nomeada em `zeros` que é 0 para cada time
 
 Depois cria uma lista que possui 4 valores: gols_marcados, gols_sofridos, vitorias e jogos que será utilizada de variável preditora para regressão de poisson. Cada um desses itens da lista recebe a lista nomeada de zeros para cada time.
-
-
-
-
