@@ -40,7 +40,7 @@ jogos_futuros <- extrair_jogos_futuros(dados)
 ```{r}
 source("r_utils/calcula_medias.R")
 
-parametros <- calcula_medias(dados_tratados)
+parametros <- estimar_parametros(dados_tratados)
 ```
 
 3.  Gerando tabela de classificação
