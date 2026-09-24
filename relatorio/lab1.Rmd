@@ -75,6 +75,64 @@ Resultado:
 resultados_mc
 ```
 
+---
+
+Bootstrap:
+
+```{r}
+# funções do bootstrap
+source("bootstrap_time.R")
+source("resumir_bootstrap.R")
+source("bootstrap_campeonato.R")
+source("plotar_bootstrap.R")
+```
+
+```{r}
+# B replicações
+B_boot <- 10000
+
+resultados_bootstrap <- bootstrap_campeonato(
+  dados_tratados = dados_tratados,
+  parametros = parametros,
+  B = B_boot,
+  nivel = 0.95
+)
+
+resultados_bootstrap
+```
+
+
+```{r}
+grafico_bootstrap <- plotar_bootstrap(
+  resultados_bootstrap
+)
+
+grafico_bootstrap
+```
+
+
+Persistindo resultados:
+```{r}
+write_csv(
+  resultados_bootstrap,
+  file.path(
+    resultados_path,
+    "resultados_bootstrap.csv"
+  )
+)
+
+ggsave(
+  filename = file.path(
+    resultados_path,
+    "intervalos_bootstrap.png"
+  ),
+  plot = grafico_bootstrap,
+  width = 10,
+  height = 8,
+  dpi = 300
+)
+```
+
 
 A.  Gerando outputs
 
